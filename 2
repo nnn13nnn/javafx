@@ -1,0 +1,68 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="15.0" prefHeight="300.0" prefWidth="400.0" 
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="hellofx.Controller">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label fx:id="label" text="Μετρητής: 0" textAlignment="CENTER" />
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <children>
+            <Button fx:id="btnClick" text="Πάτησέ με (+1)" onAction="#onButtonClick" 
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 5;" />
+            <Button fx:id="btnReset" text="Επαναφορά (0)" onAction="#onResetClick" 
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 5;" />
+        </children>
+    </HBox>
+</VBox>
+
+
+package hellofx;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+
+public class Controller {
+
+    @FXML
+    private Label label;
+
+    @FXML
+    private Button btnClick;
+
+    @FXML
+    private Button btnReset;
+
+    private int clickCount = 0;
+
+    public void initialize() {
+        updateLabel();
+    }
+
+    @FXML
+    private void onButtonClick() {
+        clickCount++;
+        updateLabel();
+    }
+
+    @FXML
+    private void onResetClick() {
+        clickCount = 0;
+        updateLabel();
+    }
+
+    private void updateLabel() {
+        label.setText("Μετρητής: " + clickCount);
+    }
+}
