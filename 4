@@ -1,0 +1,36 @@
+package hellofx;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+
+public class Controller {
+
+    @FXML
+    private Label label;
+
+    @FXML
+    private Label counterLabel;
+
+    @FXML
+    private Button myButton;
+
+    private int clickCount = 0;
+    private static final double STEP_RIGHT = 10.0;
+
+    public void initialize() {
+        String javaVersion = System.getProperty("java.version");
+        String javafxVersion = System.getProperty("javafx.version");
+        label.setText("Hello, JavaFX " + javafxVersion + "\nRunning on Java " + javaVersion + ".");
+        counterLabel.setText("Μετρητής: 0");
+    }
+
+    @FXML
+    private void onButtonClick() {
+        clickCount++;
+        counterLabel.setText("Μετρητής: " + clickCount);
+
+        // Μετακίνηση προς τα δεξιά
+        myButton.setTranslateX(myButton.getTranslateX() + STEP_RIGHT);
+    }
+}
