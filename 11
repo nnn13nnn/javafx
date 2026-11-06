@@ -88,3 +88,39 @@ public class Controller {
         return (col == null) ? 0 : col;
     }
 }
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="15.0" prefHeight="450.0" prefWidth="550.0" 
+      xmlns="http://javafx.com" xmlns:fx="http://javafx.com" 
+      fx:controller="hellofx.Controller"
+      style="-fx-background-color: #f4f4f4;"> <!-- Μικρή αλλαγή στο background για ομορφιά -->
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label fx:id="label" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;" />
+    <Label fx:id="counterLabel" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #555;" />
+    
+    <Label fx:id="statusLabel" wrapText="true" textAlignment="CENTER" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #e65100;" />
+
+    <GridPane fx:id="board" alignment="CENTER" hgap="10.0" vgap="15.0" style="-fx-background-color: #ddd; -fx-padding: 10; -fx-background-radius: 5;">
+        <Button fx:id="button1" onAction="#onButtonClick" 
+                GridPane.columnIndex="0" GridPane.rowIndex="0" 
+                prefWidth="90.0" prefHeight="50.0" 
+                style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-base: #90caf9;" />
+        
+        <Button fx:id="button2" onAction="#onButtonClick" 
+                GridPane.columnIndex="4" GridPane.rowIndex="0" 
+                prefWidth="90.0" prefHeight="50.0" 
+                style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-base: #ef9a9a;" />
+    </GridPane>
+</VBox>
