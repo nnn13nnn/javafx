@@ -1,0 +1,90 @@
+
+
+java
+package hellofx;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import java.util.Random;
+
+public class Controller {
+
+    @FXML private Label label;
+    @FXML private Label counterLabel;
+    @FXML private Label statusLabel;
+    @FXML private Button button1;
+    @FXML private Button button2;
+
+    private int clickCount = 0;
+    private final Random random = new Random();
+
+    public void initialize() {
+        label.setText("Maximus Math Square: Η Μάχη των Αθροισμάτων!");
+        counterLabel.setText("Κινήσεις: 0");
+        statusLabel.setText("Υπολόγισε το άθροισμα και κινήσου στρατηγικά!");
+
+        generateNewAddition(button1);
+        generateNewAddition(button2);
+    }
+
+    @FXML
+    private void onButtonClick(ActionEvent event) {
+        Button clickedButton = (Button) event.getSource();
+        Button otherButton = (clickedButton == button1) ? button2 : button1;
+
+        if (!otherButton.isVisible()) {
+            statusLabel.setText("Το παιχνίδι τελείωσε! Έχεις ήδη κερδίσει.");
+            return;
+        }
+
+        int currentCol = getColumn(clickedButton);
+        int targetCol = (clickedButton == button1) ? currentCol + 1 : currentCol - 1;
+        int otherCol = getColumn(otherButton);
+
+        if (targetCol == otherCol) {
+            int clickedSum = evaluateAddition(clickedButton.getText());
+            int otherSum = evaluateAddition(otherButton.getText());
+
+            if (clickedSum >= otherSum) {
+                otherButton.setVisible(false);
+                statusLabel.setText("💥 ΝΙΚΗ! Το άθροισμά σου (" + clickedSum + ") νίκησε το (" + otherSum + ")!");
+            } else {
+                statusLabel.setText("❌ ΜΠΛΟΚΟ! Το άθροισμά σου (" + clickedSum + ") είναι μικρότερο από του αντιπάλου (" + otherSum + ").");
+                return; // Ακύρωση κίνησης
+            }
+        } else {
+            statusLabel.setText("Ασφαλής κίνηση! Νέα πράξη δημιουργήθηκε.");
+            generateNewAddition(clickedButton);
+        }
+
+        clickCount++;
+        counterLabel.setText("Κινήσεις: " + clickCount);
+        GridPane.setColumnIndex(clickedButton, targetCol);
+    }
+
+  
+    private void generateNewAddition(Button button) {
+        int num1 = random.nextInt(9) + 1;
+        int num2 = random.nextInt(9) + 1;
+        button.setText(num1 + " + " + num2);
+    }
+
+   
+    private int evaluateAddition(String text) {
+       
+        String[] parts = text.split(" \\+ ");
+        
+        int num1 = Integer.parseInt(parts[0].trim());
+        int num2 = Integer.parseInt(parts[1].trim());
+        
+        return num1 + num2; // Επιστρέφει το τελικό άθροισμα
+    }
+
+    private int getColumn(Button button) {
+        Integer col = GridPane.getColumnIndex(button);
+        return (col == null) ? 0 : col;
+    }
+}
