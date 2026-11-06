@@ -1,0 +1,114 @@
+java
+package hellofx;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import java.util.Random;
+
+public class Controller {
+
+    @FXML
+    private Label label;
+
+    @FXML
+    private Label counterLabel;
+
+    @FXML
+    private Label statusLabel;
+
+    @FXML
+    private Button button1;
+
+    @FXML
+    private Button button2;
+
+    private int clickCount = 0;
+
+    public void initialize() {
+        String javaVersion = System.getProperty("java.version");
+        String javafxVersion = System.getProperty("javafx.version");
+        label.setText("Hello, JavaFX " + javafxVersion + "\nRunning on Java " + javaVersion + ".");
+        counterLabel.setText("Μετρητής: 0");
+        statusLabel.setText("");
+
+        Random random = new Random();
+        int randomNumber1 = random.nextInt(100) + 1;
+        int randomNumber2 = random.nextInt(100) + 1;
+
+        button1.setText(String.valueOf(randomNumber1));
+        button2.setText(String.valueOf(randomNumber2));
+    }
+
+    @FXML
+    private void onButtonClick(ActionEvent event) {
+        Button clickedButton = (Button) event.getSource();
+
+        // Εντοπισμός ποιο είναι το άλλο κουμπί
+        Button otherButton = (clickedButton == button1) ? button2 : button1;
+
+        int currentCol = getColumn(clickedButton);
+        int currentRow = getRow(clickedButton);
+
+        int otherCol = getColumn(otherButton);
+        int otherRow = getRow(otherButton);
+
+        int targetCol = currentCol + 1;
+        int targetRow = currentRow;
+
+        if (targetCol == otherCol && targetRow == otherRow) {
+            statusLabel.setText("ΠΡΟΣΟΧΗ: Το κελί είναι κατειλημμένο! Δεν μπορείς να πας δεξιά.");
+            return; // Ακύρωση κίνησης
+        }
+
+        statusLabel.setText(""); 
+        clickCount++;
+        counterLabel.setText("Μετρητής: " + clickCount);
+
+        GridPane.setColumnIndex(clickedButton, targetCol);
+    }
+
+    private int getColumn(Button button) {
+        Integer col = GridPane.getColumnIndex(button);
+        return (col == null) ? 0 : col;
+    }
+
+    private int getRow(Button button) {
+        Integer row = GridPane.getRowIndex(button);
+        return (row == null) ? 0 : row;
+    }
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="15.0" prefHeight="450.0" prefWidth="550.0" 
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="hellofx.Controller">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label fx:id="label" text="Maximus Math Square" textAlignment="CENTER" />
+    <Label fx:id="counterLabel" text="Μετρητής: 0" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+    
+    <Label fx:id="statusLabel" text="" textFill="RED" style="-fx-font-weight: bold;" />
+
+    <GridPane fx:id="board" alignment="CENTER" hgap="20.0" vgap="15.0">
+        <!-- Αρχική θέση: Στήλη 0 -->
+        <Button fx:id="button1" text="-" onAction="#onButtonClick" 
+                GridPane.columnIndex="0" GridPane.rowIndex="0" prefWidth="110.0" prefHeight="40.0" />
+        
+        <!-- Αρχική θέση: Στήλη 3 (για να έχει χώρο το button1 να κινηθεί δεξιά) -->
+        <Button fx:id="button2" text="-" onAction="#onButtonClick" 
+                GridPane.columnIndex="3" GridPane.rowIndex="0" prefWidth="110.0" prefHeight="40.0" />
+    </GridPane>
+</VBox>
