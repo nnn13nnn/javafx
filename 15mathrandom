@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="15.0" prefHeight="350.0" prefWidth="450.0" 
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="hellofx.Controller">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label text="Υπολόγισε το αποτέλεσμα:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button fx:id="btnNum1" text="0" prefWidth="60.0" style="-fx-font-size: 18px;" />
+        <Button fx:id="btnOperator" text="+" prefWidth="50.0" style="-fx-font-size: 18px;" />
+        <Button fx:id="btnNum2" text="0" prefWidth="60.0" style="-fx-font-size: 18px;" />
+    </HBox>
+
+    <TextField fx:id="answerField" promptText="Γράψε την απάντηση εδώ..." maxWidth="200.0" alignment="CENTER" />
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button text="Έλεγχος" onAction="#checkAnswer" />
+        <Button text="Νέα Πράξη" onAction="#generateNewQuestion" />
+    </HBox>
+
+    <Label fx:id="resultLabel" text="" style="-fx-font-size: 14px;" />
+</VBox>
+
+
+
+
+package hellofx;
+
+import java.util.Random;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+
+public class Controller {
+
+    @FXML
+    private Button btnNum1;
+
+    @FXML
+    private Button btnOperator;
+
+    @FXML
+    private Button btnNum2;
+
+    @FXML
+    private TextField answerField;
+
+    @FXML
+    private Label resultLabel;
+
+    private int num1;
+    private int num2;
+    private String operator;
+    private int correctAnswer;
+    private Random random = new Random();
+
+    public void initialize() {
+        generateNewQuestion();
+    }
+
+    @FXML
+    private void generateNewQuestion() {
+        num1 = random.nextInt(10) + 1;
+        num2 = random.nextInt(10) + 1;
+
+        String[] operators = {"+", "-", "*"};
+        operator = operators[random.nextInt(operators.length)];
+
+        switch (operator) {
+            case "+":
+                correctAnswer = num1 + num2;
+                break;
+            case "-":
+                correctAnswer = num1 - num2;
+                break;
+            case "*":
+                correctAnswer = num1 * num2;
+                break;
+        }
+
+        btnNum1.setText(String.valueOf(num1));
+        btnOperator.setText(operator);
+        btnNum2.setText(String.valueOf(num2));
+
+        answerField.clear();
+        resultLabel.setText("");
+    }
+
+    @FXML
+    private void checkAnswer() {
+        try {
+            // Μετατροπή του κειμένου που έγραψε ο χρήστης σε ακέραιο αριθμό
+            int userAnswer = Integer.parseInt(answerField.getText().trim());
+
+            if (userAnswer == correctAnswer) {
+                resultLabel.setText("Σωστό! Μπράβο!");
+                resultLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+            } else {
+                resultLabel.setText("Λάθος! Το σωστό είναι: " + correctAnswer);
+                resultLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            }
+        } catch (NumberFormatException e) {
+            // Αν ο χρήστης πατήσει Έλεγχο χωρίς να έχει γράψει έγκυρο αριθμό
+            resultLabel.setText("Παρακαλώ γράψε έναν έγκυρο αριθμό!");
+            resultLabel.setStyle("-fx-text-fill: orange;");
+        }
+    }
+}
