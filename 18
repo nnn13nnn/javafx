@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="15.0" prefHeight="400.0" prefWidth="480.0" 
+      xmlns="http://javafx.com" xmlns:fx="http://javafx.com" 
+      fx:controller="hellofx.Controller">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="CENTER" spacing="40.0">
+        <Label fx:id="scoreLabel" text="Σκορ: 0 / 0" style="-fx-font-size: 16px; -fx-text-fill: #2a5885; -fx-font-weight: bold;" />
+        <Label fx:id="timerLabel" text="Χρόνος: 30s" style="-fx-font-size: 16px; -fx-text-fill: #d9534f; -fx-font-weight: bold;" />
+    </HBox>
+
+    <Label text="Υπολόγισε το αποτέλεσμα:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button fx:id="btnNum1" text="0" prefWidth="60.0" style="-fx-font-size: 18px;" />
+        <Button fx:id="btnOperator" text="+" prefWidth="50.0" style="-fx-font-size: 18px;" />
+        <Button fx:id="btnNum2" text="0" prefWidth="60.0" style="-fx-font-size: 18px;" />
+    </HBox>
+
+    <TextField fx:id="answerField" promptText="Γράψε την απάντηση εδώ..." maxWidth="200.0" alignment="CENTER" onAction="#checkAnswer" />
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button fx:id="checkButton" text="Έλεγχος" onAction="#checkAnswer" />
+        <Button fx:id="nextButton" text="Νέα Πράξη" onAction="#generateNewQuestion" />
+        <Button text="Επαναφορά Σκορ" onAction="#resetGame" style="-fx-background-color: #f0ad4e; -fx-text-fill: white; -fx-font-weight: bold;" />
+    </HBox>
+
+    <Label fx:id="resultLabel" text="" style="-fx-font-size: 14px;" />
+</VBox>
+
+
+
+package hellofx;
+
+import java.util.Random;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.util.Duration;
+
+public class Controller {
+
+    @FXML
+    private Label scoreLabel;
+
+    @FXML
+    private Label timerLabel;
+
+    @FXML
+    private Button btnNum1;
+
+    @FXML
+    private Button btnOperator;
+
+    @FXML
+    private Button btnNum2;
+
+    @FXML
+    private TextField answerField;
+
+    @FXML
+    private Button checkButton;
+
+    @FXML
+    private Button nextButton;
+
+    @FXML
+    private Label resultLabel;
+
+    private int num1;
+    private int num2;
+    private String operator;
+    private int correctAnswer;
+
+    // Μεταβλητές σκορ
+    private int score = 0;
+    private int totalAttempts = 0;
+    private boolean alreadyAnswered = false;
+
+    // Μεταβλητές χρονομέτρου
+    private Timeline timeline;
+    private int timeSeconds = 30;
+    private boolean isGameOver = false;
+
+    private Random random = new Random();
+
+    public void initialize() {
+        setupTimer();
+        resetGame();
+    }
+
+    private void setupTimer() {
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            timeSeconds--;
+            timerLabel.setText("Χρόνος: " + timeSeconds + "s");
+
+            if (timeSeconds <= 0) {
+                endGame();
+            }
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+    }
+
+    private void endGame() {
+        timeline.stop();
+        isGameOver = true;
+        answerField.setDisable(true);
+        checkButton.setDisable(true);
+        nextButton.setDisable(true);
+        resultLabel.setText("Τέλος χρόνου! Τελικό σκορ: " + score + " / " + totalAttempts);
+        resultLabel.setStyle("-fx-text-fill: #2a5885; -fx-font-weight: bold; -fx-font-size: 15px;");
+    }
+
+    @FXML
+    private void resetGame() {
+        if (timeline != null) {
+            timeline.stop();
+        }
+        
+        score = 0;
+        totalAttempts = 0;
+        timeSeconds = 30;
+        isGameOver = false;
+
+        scoreLabel.setText("Σκορ: 0 / 0");
+        timerLabel.setText("Χρόνος: 30s");
+
+        answerField.setDisable(false);
+        nextButton.setDisable(false);
+
+        generateNewQuestion();
+        timeline.playFromStart();
+    }
+
+    @FXML
+    private void generateNewQuestion() {
+        if (isGameOver) {
+            return;
+        }
+
+      /
+
+      int pinakas [] = {1,2,3,4,5,6,7,8,9,10};
+num1 = pinakas[random.nextInt(pinakas.length)];
+num2 = pinakas[random.nextInt(pinakas.length)];
+        String[] operators = {"+", "-", "*"};
+        operator = operators[random.nextInt(operators.length)];
+
+        switch (operator) {
+            case "+":
+                correctAnswer = num1 + num2;
+                break;
+            case "-":
+                correctAnswer = num1 - num2;
+                break;
+            case "*":
+                correctAnswer = num1 * num2;
+                break;
+        }
+
+        btnNum1.setText(String.valueOf(num1));
+        btnOperator.setText(operator);
+        btnNum2.setText(String.valueOf(num2));
+
+        answerField.clear();
+        resultLabel.setText("");
+        alreadyAnswered = false;
+        checkButton.setDisable(false);
+        answerField.requestFocus();
+    }
+
+    @FXML
+    private void checkAnswer() {
+        if (alreadyAnswered || isGameOver) {
+            return;
+        }
+
+        try {
+            int userAnswer = Integer.parseInt(answerField.getText().trim());
+            totalAttempts++;
+            alreadyAnswered = true;
+            checkButton.setDisable(true);
+
+            if (userAnswer == correctAnswer) {
+                score++;
+                resultLabel.setText("Σωστό! Μπράβο!");
+                resultLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+            } else {
+                resultLabel.setText("Λάθος! Το σωστό είναι: " + correctAnswer);
+                resultLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            }
+
+            scoreLabel.setText("Σκορ: " + score + " / " + totalAttempts);
+
+        } catch (NumberFormatException e) {
+            resultLabel.setText("Παρακαλώ γράψε έναν έγκυρο αριθμό!");
+            resultLabel.setStyle("-fx-text-fill: orange;");
+        }
+    }
+}
