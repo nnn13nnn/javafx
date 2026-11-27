@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="15.0" prefHeight="420.0" prefWidth="480.0"
+      xmlns="http://javafx.com" xmlns:fx="http://javafx.com"
+      fx:controller="hellofx.Controller">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="CENTER" spacing="40.0">
+        <Label fx:id="scoreLabel" text="Σκορ: 0 / 0" style="-fx-font-size: 16px; -fx-text-fill: #2a5885; -fx-font-weight: bold;" />
+        <Label fx:id="timerLabel" text="Χρόνος: 30s" style="-fx-font-size: 16px; -fx-text-fill: #d9534f; -fx-font-weight: bold;" />
+    </HBox>
+
+    <HBox alignment="CENTER" spacing="15.0">
+        <Button fx:id="btnThreeLetters" text="3 Γράμματα" onAction="#selectThreeLetters"
+                style="-fx-background-color: #2a5885; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+        <Button fx:id="btnFourLetters" text="4 Γράμματα" onAction="#selectFourLetters"
+                style="-fx-background-color: #5bc0de; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+    </HBox>
+
+    <Label text="Μάντεψε τη λέξη:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button fx:id="btnLetter1" text="_" prefWidth="60.0" prefHeight="50.0" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+        <Button fx:id="btnLetter2" text="_" prefWidth="60.0" prefHeight="50.0" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+        <Button fx:id="btnLetter3" text="_" prefWidth="60.0" prefHeight="50.0" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+        <Button fx:id="btnLetter4" text="_" prefWidth="60.0" prefHeight="50.0" style="-fx-font-size: 20px; -fx-font-weight: bold;" visible="false" managed="false" />
+    </HBox>
+
+    <TextField fx:id="answerField" promptText="Γράψε τη λέξη εδώ..." maxWidth="200.0" alignment="CENTER" onAction="#checkAnswer" />
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button fx:id="checkButton" text="Έλεγχος" onAction="#checkAnswer" />
+        <Button fx:id="nextButton" text="Νέα Λέξη" onAction="#generateNewWord" />
+        <Button text="Επαναφορά Σκορ" onAction="#resetGame" style="-fx-background-color: #f0ad4e; -fx-text-fill: white; -fx-font-weight: bold;" />
+    </HBox>
+
+    <Label fx:id="resultLabel" text="" style="-fx-font-size: 14px;" />
+</VBox>
+
+
+
+
+package hellofx;
+
+import java.util.Random;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.util.Duration;
+
+public class Controller {
+
+    @FXML
+    private Label scoreLabel;
+    @FXML
+    private Label timerLabel;
+
+    @FXML
+    private Button btnThreeLetters;
+    @FXML
+    private Button btnFourLetters;
+
+    @FXML
+    private Button btnLetter1;
+    @FXML
+    private Button btnLetter2;
+    @FXML
+    private Button btnLetter3;
+    @FXML
+    private Button btnLetter4;
+
+    @FXML
+    private TextField answerField;
+    @FXML
+    private Button checkButton;
+    @FXML
+    private Button nextButton;
+    @FXML
+    private Label resultLabel;
+
+    private final String[] threeLetterWords = {
+        "ΦΩΣ", "ΖΩΗ", "ΓΗΣ", "ΝΕΑ", "ΔΥΟ", "ΜΙΑ", "ΟΧΙ", "ΝΑΙ", "ΠΩΣ", "ΕΔΩ"
+    };
+    private final String[] fourLetterWords = {
+        "ΓΑΤΑ", "ΝΕΡΟ", "ΧΕΡΙ", "ΠΟΔΙ", "ΜΑΤΙ", "ΨΑΡΙ", "ΜΗΛΟ", "ΚΥΜΑ", "ΦΙΛΙ", "ΛΥΚΟ"
+    };
+
+    private int selectedLength = 3;
+    private String currentWord = "";
+
+    private int score = 0;
+    private int totalAttempts = 0;
+    private boolean alreadyAnswered = false;
+
+    private Timeline timeline;
+    private int timeSeconds = 30;
+    private boolean isGameOver = false;
+
+    private final Random random = new Random();
+
+    public void initialize() {
+        setupTimer();
+        selectThreeLetters();
+    }
+
+    private void setupTimer() {
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            timeSeconds--;
+            timerLabel.setText("Χρόνος: " + timeSeconds + "s");
+            if (timeSeconds <= 0) {
+                endGame();
+            }
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+    }
+
+    private void endGame() {
+        timeline.stop();
+        isGameOver = true;
+        answerField.setDisable(true);
+        checkButton.setDisable(true);
+        nextButton.setDisable(true);
+        revealWord();
+        resultLabel.setText("Τέλος χρόνου! Τελικό σκορ: " + score + " / " + totalAttempts);
+        resultLabel.setStyle("-fx-text-fill: #2a5885; -fx-font-weight: bold; -fx-font-size: 15px;");
+    }
+
+    @FXML
+    private void selectThreeLetters() {
+        selectedLength = 3;
+        btnLetter4.setVisible(false);
+        btnLetter4.setManaged(false);
+        btnThreeLetters.setStyle("-fx-background-color: #2a5885; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+        btnFourLetters.setStyle("-fx-background-color: #b0c4de; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+        resetGame();
+    }
+
+    @FXML
+    private void selectFourLetters() {
+        selectedLength = 4;
+        btnLetter4.setVisible(true);
+        btnLetter4.setManaged(true);
+        btnFourLetters.setStyle("-fx-background-color: #2a5885; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+        btnThreeLetters.setStyle("-fx-background-color: #b0c4de; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+        resetGame();
+    }
+
+    @FXML
+    private void resetGame() {
+        if (timeline != null) {
+            timeline.stop();
+        }
+        score = 0;
+        totalAttempts = 0;
+        timeSeconds = 30;
+        isGameOver = false;
+        scoreLabel.setText("Σκορ: 0 / 0");
+        timerLabel.setText("Χρόνος: 30s");
+        answerField.setDisable(false);
+        nextButton.setDisable(false);
+        generateNewWord();
+        timeline.playFromStart();
+    }
+
+    @FXML
+    private void generateNewWord() {
+        if (isGameOver) {
+            return;
+        }
+
+        if (selectedLength == 3) {
+            currentWord = threeLetterWords[random.nextInt(threeLetterWords.length)];
+            btnLetter1.setText(String.valueOf(currentWord.charAt(0)));
+            btnLetter2.setText("_");
+            btnLetter3.setText("_");
+        } else {
+            currentWord = fourLetterWords[random.nextInt(fourLetterWords.length)];
+            btnLetter1.setText(String.valueOf(currentWord.charAt(0)));
+            btnLetter2.setText("_");
+            btnLetter3.setText("_");
+            btnLetter4.setText("_");
+        }
+
+        answerField.clear();
+        resultLabel.setText("");
+        alreadyAnswered = false;
+        checkButton.setDisable(false);
+        answerField.requestFocus();
+    }
+
+    private void revealWord() {
+        btnLetter1.setText(String.valueOf(currentWord.charAt(0)));
+        btnLetter2.setText(String.valueOf(currentWord.charAt(1)));
+        btnLetter3.setText(String.valueOf(currentWord.charAt(2)));
+        if (currentWord.length() == 4) {
+            btnLetter4.setText(String.valueOf(currentWord.charAt(3)));
+        }
+    }
+
+    @FXML
+    private void checkAnswer() {
+        if (alreadyAnswered || isGameOver) {
+            return;
+        }
+
+        String userGuess = answerField.getText().trim().toUpperCase();
+
+        if (userGuess.isEmpty()) {
+            resultLabel.setText("Παρακαλώ γράψε μια λέξη!");
+            resultLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+            return;
+        }
+
+        if (userGuess.length() != selectedLength) {
+            resultLabel.setText("Η λέξη πρέπει να έχει " + selectedLength + " γράμματα!");
+            resultLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+            return;
+        }
+
+        totalAttempts++;
+        alreadyAnswered = true;
+        checkButton.setDisable(true);
+        revealWord();
+
+        if (userGuess.equals(currentWord)) {
+            score++;
+            resultLabel.setText("Σωστό! Μπράβο!");
+            resultLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+        } else {
+            resultLabel.setText("Λάθος! Η λέξη ήταν: " + currentWord);
+            resultLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+        }
+
+        scoreLabel.setText("Σκορ: " + score + " / " + totalAttempts);
+    }
+}
